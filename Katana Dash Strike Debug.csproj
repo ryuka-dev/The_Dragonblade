@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="Toggle Melee Stance">
       <HintPath>..\Toggle_Melee_Stance\bin\Debug\Toggle Melee Stance.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>D:\SteamLibrary\steamapps\common\SULFUR\Sulfur_Data\Managed\Unity.InputSystem.dll</HintPath>
