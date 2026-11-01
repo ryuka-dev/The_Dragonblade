@@ -5,3 +5,9 @@ obj/
 # Visual Studio
 .vs/
 *.user
+
+# Build products / packaging artifacts (never committed)
+*.dll
+*.zip
+*.psd
+dist/

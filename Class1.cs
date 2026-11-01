@@ -26,7 +26,7 @@ namespace MeleeExpansion
     {
         public const string PluginGuid = "kumo.sulfur.melee_expansion";
         public const string PluginName = "The Dragonblade";
-        public const string PluginVersion = "0.3.0";
+        public const string PluginVersion = "0.4.0";
         public const string ToggleMeleeStanceGuid = "kumo.sulfur.toggle_melee_stance";
 
         internal static ManualLogSource Log;

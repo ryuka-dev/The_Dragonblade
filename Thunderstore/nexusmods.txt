@@ -1,0 +1,384 @@
+[font=Arial Black][color=DarkOrange][size=5][b]The Dragonblade[/b][/size][/color][/font]
+
+You found a katana with the words “Ryu-Ichimonji” carved into its blade.
+
+You are not him.  
+But for a moment, a fragment of his power answers your hand.
+
+[color=RoyalBlue][b]Overview[/b][/color]
+
+The Dragonblade is a katana-focused melee expansion mod for SULFUR.
+
+It adds a cyber-ninja style dash strike, kill-based cooldown refresh, enemy-kill healing, and a bottom-right ability HUD for katana stance gameplay.
+
+Works on SULFUR 1.0 (tested on 1.0.2).
+
+Starting from [color=#ffff00]0.3.0[/color], The Dragonblade uses [b]Toggle Melee Stance[/b] as its prerequisite melee stance module.
+
+[color=RoyalBlue][b]Required Dependency[/b][/color]
+
+The Dragonblade requires:
+
+[code]Toggle Melee Stance 1.5.0 or newer[/code]
+Toggle Melee Stance provides:
+
+[code]Tap melee key
+→ Toggle melee stance
+
+Hold melee key
+→ Use original melee behavior
+
+Fire while toggled
+→ Perform melee attack
+
+Aim / Alt Fire while toggled
+→ Keep vanilla alternative stance / block behavior[/code]
+The Dragonblade no longer duplicates those toggle melee patches internally.
+
+This reduces conflicts and prevents both mods from fighting over the same melee input state.
+
+[color=RoyalBlue][b]Features[/b][/color]
+
+[list]
+[*]Uses Toggle Melee Stance as the shared stance foundation.[/*]
+[*]While holding a katana, Sprint becomes Dash Strike.[/*]
+[*]Dash Strike moves in the direction you are looking.[/*]
+[*]Dash Strike uses the current katana as the damage source.[/*]
+[*]Killing an enemy refreshes Dash Strike.[/*]
+[*]Killing an enemy heals the player.[/*]
+[*]Breakable objects do not heal the player.[/*]
+[*]Optional config allows non-NPC units, such as breakable obstacles, to refresh cooldown.[/*]
+[*]Includes an ability icon HUD with cooldown display, refresh feedback, and healing feedback.[/*]
+[*]Includes a small post-dash hang window to make aerial dash movement feel smoother.[/*]
+[/list]
+[color=RoyalBlue][b]Basic controls[/b][/color]
+
+While holding a katana-like melee weapon and Toggle Melee Stance is active:
+
+[code]Tap Melee key
+→ Toggle melee stance on / off
+
+Hold Melee key
+→ Use the original melee behavior
+→ Release to perform the original melee attack
+→ Return to the previous weapon
+
+Fire
+→ Perform one melee attack while melee stance is active
+
+Aim
+→ Keep original aim / block behavior
+
+Sprint
+→ Dash Strike
+
+Weapon slot key / scroll wheel / d-pad
+→ Leave melee stance and switch to that weapon[/code]
+The Dragonblade does not hardcode [color=#ffff00]F[/color], [color=#ffff00]LeftShift[/color], mouse buttons, or controller buttons.
+
+It relies on Toggle Melee Stance and the game's own input actions, so it should respect key rebinding and controller input better than raw key checks.
+
+[color=RoyalBlue][b]Installation[/b][/color]
+
+With a mod manager such as Gale or r2modman, Toggle Melee Stance is installed for you.
+
+Manual installation:
+
+[list=1]
+[*]Install BepInEx 5 for SULFUR.[/*]
+[*]Install Toggle Melee Stance 1.5.0 or newer.[/*]
+[*]Create a folder for The Dragonblade in [color=#ffff00]BepInEx/plugins[/color] and copy [color=#ffff00]The Dragonblade.dll[/color], [color=#ffff00]dash_icon.png[/color] and the [color=#ffff00]lang[/color] folder into it.[/*]
+[*]Make sure the files are placed like this:[/*]
+[/list]
+[code]BepInEx/
+└─plugins/
+  ├─Toggle Melee Stance.dll
+  └─The Dragonblade/
+    ├─The Dragonblade.dll
+    ├─dash_icon.png
+    └─lang/[/code]
+Updating by hand: the plugin file is still [color=#ffff00]The Dragonblade.dll[/color], so replace the old one and don't keep a second copy anywhere in [color=#ffff00]BepInEx/plugins[/color]. A manual install doesn't pull dependencies, so update Toggle Melee Stance to 1.5.0 yourself as well. [color=#ffff00]dash_icon.png[/color] and the [color=#ffff00]lang[/color] folder go next to the DLL.
+
+[color=RoyalBlue][b]Compatibility[/b][/color]
+
+Do not install old standalone melee toggle mods together with The Dragonblade unless they are Toggle Melee Stance 1.5.0 or newer.
+
+The Dragonblade now depends on Toggle Melee Stance for the stance system.
+
+The Dragonblade no longer patches these toggle melee methods directly:
+
+[code]EquipmentManager.HandleMeleeInput(bool)
+EquipmentManager.HandleAimInput(bool)
+EquipmentManager.PullTrigger()
+EquipmentManager.ReleaseTrigger()
+Weapon.ReportMeleeDone()
+Weapon.ChargeMelee(bool)[/code]
+Those are handled by Toggle Melee Stance.
+
+The Dragonblade still patches systems needed for dash, movement, HUD, and kill rewards.
+
+[color=RoyalBlue][b]Compatibility with Random Weapon Per Level[/b][/color]
+
+External weapon-switch handling is now owned by Toggle Melee Stance.
+
+Default behavior:
+
+[code]Kill enemy
+→ Another mod switches your weapon
+→ You try to fire
+→ Toggle Melee Stance exits melee stance
+→ The gun fires normally[/code]
+This prevents a broken state where the player appears to be holding a gun, but melee stance still intercepts the fire input.
+
+Recommended Toggle Melee Stance config:
+
+[code][Compatibility]
+KeepMeleeStanceAfterExternalWeaponSwitch = false[/code]
+[color=RoyalBlue][b]Configuration[/b][/color]
+
+The Dragonblade config file is generated after launching the game once:
+
+[code]BepInEx/config/kumo.sulfur.melee_expansion.cfg[/code]
+Each option below is shown with its default value.
+
+[color=DodgerBlue][b]EnableMod[/b][/color]
+
+Turns the whole mod on or off.
+
+[code][General]
+EnableMod = true[/code]
+[color=DodgerBlue][b]EnableKatanaDash[/b][/color]
+
+Turns Dash Strike on or off.
+
+[code][KatanaDash]
+EnableKatanaDash = true[/code]
+[color=DodgerBlue][b]KatanaNameKeywords[/b][/color]
+
+Comma-separated keywords used to detect katana-like melee weapons.
+
+[code][KatanaDash]
+KatanaNameKeywords = Katana,Wakizashi,BiggerKatana[/code]
+[color=DodgerBlue][b]Cooldown[/b][/color]
+
+Dash cooldown in seconds (0.1 to 60).
+
+[code][KatanaDash]
+Cooldown = 5[/code]
+[color=DodgerBlue][b]Distance[/b][/color]
+
+Dash distance (0.5 to 50).
+
+[code][KatanaDash]
+Distance = 8[/code]
+[color=DodgerBlue][b]Duration[/b][/color]
+
+Dash duration in seconds (0.03 to 2).
+
+[code][KatanaDash]
+Duration = 0.22[/code]
+[color=DodgerBlue][b]HitRadius[/b][/color]
+
+Radius used to find enemies along the dash path (0.1 to 5).
+
+[code][KatanaDash]
+HitRadius = 1[/code]
+[color=DodgerBlue][b]DamageMultiplier[/b][/color]
+
+Multiplier applied to the current katana's damage (0 to 20).
+
+[code][KatanaDash]
+DamageMultiplier = 1[/code]
+[color=DodgerBlue][b]HitEachUnitOnce[/b][/color]
+
+If true, each enemy can only be hit once per dash.
+
+[code][KatanaDash]
+HitEachUnitOnce = true[/code]
+[color=DodgerBlue][b]RefreshCooldownOnPlayerKill[/b][/color]
+
+Resets the dash cooldown when you kill an enemy.
+
+[code][KatanaDash]
+RefreshCooldownOnPlayerKill = true[/code]
+[color=DodgerBlue][b]RefreshRequiresKatanaStance[/b][/color]
+
+If true, kill refresh and healing only work while melee stance is toggled on with a katana.
+
+[code][KatanaDash]
+RefreshRequiresKatanaStance = true[/code]
+[color=DodgerBlue][b]RefreshCooldownOnNonNpcUnitKill[/b][/color]
+
+If true, breaking non-NPC units such as obstacles also resets the dash cooldown. These never heal you.
+
+[code][KatanaDash]
+RefreshCooldownOnNonNpcUnitKill = false[/code]
+[color=DodgerBlue][b]HealOnEnemyKill[/b][/color]
+
+Heals you when you kill an enemy NPC, under the same conditions as the kill refresh. Breakable obstacles never trigger it.
+
+[code][KatanaDash]
+HealOnEnemyKill = true[/code]
+[color=DodgerBlue][b]HealAmountOnEnemyKill[/b][/color]
+
+Health restored per enemy kill (0 to 999).
+
+[code][KatanaDash]
+HealAmountOnEnemyKill = 5[/code]
+[color=DodgerBlue][b]PostHangDuration[/b][/color]
+
+Short hang time in seconds after a dash ends, so you don't drop at full falling speed right away (0 to 0.5).
+
+[code][KatanaDash]
+PostHangDuration = 0.12[/code]
+[color=DodgerBlue][b]PostHangMaxDownwardSpeed[/b][/color]
+
+Maximum falling speed during the post-dash hang. 0 means no falling at all during the hang (0 to 20).
+
+[code][KatanaDash]
+PostHangMaxDownwardSpeed = 0.5[/code]
+[color=DodgerBlue][b]SuppressFallingAnimationDuringPostHang[/b][/color]
+
+Hides the falling animation during the post-dash hang.
+
+[code][KatanaDash]
+SuppressFallingAnimationDuringPostHang = true[/code]
+[color=DodgerBlue][b]EnableDashHud[/b][/color]
+
+Shows the dash cooldown HUD in the bottom-right corner.
+
+[code][UI]
+EnableDashHud = true[/code]
+[color=DodgerBlue][b]DashIconFileName[/b][/color]
+
+PNG file used as the HUD icon. It is loaded from the same folder as [color=#ffff00]The Dragonblade.dll[/color].
+
+[code][UI]
+DashIconFileName = dash_icon.png[/code]
+[color=DodgerBlue][b]DashHudIconSize[/b][/color]
+
+HUD icon size in pixels (48 to 128).
+
+[code][UI]
+DashHudIconSize = 76[/code]
+[color=DodgerBlue][b]DashHudUseActualSprintBinding[/b][/color]
+
+Shows your actual Sprint binding on the HUD when the game reports it.
+
+[code][UI]
+DashHudUseActualSprintBinding = true[/code]
+[color=DodgerBlue][b]DashHudFallbackKeyLabel[/b][/color]
+
+Key label shown on the HUD when the Sprint binding can't be read.
+
+[code][UI]
+DashHudFallbackKeyLabel = SHIFT[/code]
+[color=DodgerBlue][b]DashKillRefreshFeedbackDuration[/b][/color]
+
+Seconds the HUD flashes when a kill resets the cooldown (0 to 3).
+
+[code][UI]
+DashKillRefreshFeedbackDuration = 0.45[/code]
+[color=DodgerBlue][b]DashHealFeedbackDuration[/b][/color]
+
+Seconds the +HP text stays on screen after an enemy kill (0 to 3).
+
+[code][UI]
+DashHealFeedbackDuration = 0.85[/code]
+[color=DodgerBlue][b]LogDash[/b][/color]
+
+Writes dash debug events to the BepInEx log. Keep it off for normal play.
+
+[code][Debug]
+LogDash = false[/code]
+[color=DodgerBlue][b]LogStateChanges[/b][/color]
+
+Writes stance state changes to the BepInEx log. Keep it off for normal play.
+
+[code][Debug]
+LogStateChanges = false[/code]
+[color=DodgerBlue][b]Toggle Melee Stance settings[/b][/color]
+
+Toggle melee behavior is configured in Toggle Melee Stance, not in The Dragonblade.
+
+For example:
+
+[code]BepInEx/config/kumo.sulfur.toggle_melee_stance.cfg
+
+[Melee]
+EnableTapHoldMeleeKey = true
+MeleeToggleTapThreshold = 0.13
+
+[Compatibility]
+KeepMeleeStanceAfterExternalWeaponSwitch = false[/code]
+[color=RoyalBlue][b]Notes[/b][/color]
+
+[list]
+[*]The Sprint key is not hardcoded. The mod reads the game's Sprint action, so remapped controls are supported.[/*]
+[*]The Melee key behavior is provided by Toggle Melee Stance.[/*]
+[*]The Dragonblade does not simulate keyboard input.[/*]
+[*]While katana stance is active, the mod keeps the game's own sprint state active through the internal sprint system.[/*]
+[*]Dash movement is applied through the game's movement pipeline rather than directly teleporting the player.[/*]
+[*]Enemy-kill healing only works on NPC/enemy kills. Obstacles can optionally refresh cooldown, but they never heal the player.[/*]
+[/list]
+[color=RoyalBlue][b]Files[/b][/color]
+
+[code]The Dragonblade.dll
+dash_icon.png
+lang/[/code]
+[color=RoyalBlue][b]Credits[/b][/color]
+
+Created by Ryuka.
+
+This mod is an unofficial fan-made gameplay mod for SULFUR.
+
+[color=RoyalBlue][b]SULFUR Config Localization Support[/b][/color]
+
+This mod includes localization files for SULFUR Config.
+
+This localization support is only for the in-game configuration page provided by SULFUR Config. The mod name and config sections are translated in every language below, and setting names in Simplified Chinese and Japanese. Setting descriptions are still in English.
+
+It does not change the game’s own text, item names, dialogue, or gameplay content.
+
+Supported SULFUR Config languages:
+
+[list]
+[*]English[/*]
+[*]Simplified Chinese[/*]
+[*]Swedish[/*]
+[*]French[/*]
+[*]Italian[/*]
+[*]German[/*]
+[*]Spanish[/*]
+[*]Portuguese[/*]
+[*]Russian[/*]
+[*]Polish[/*]
+[*]Japanese[/*]
+[*]Korean[/*]
+[*]Turkish[/*]
+[*]Arabic[/*]
+[/list]
+[font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
+
+[color=RoyalBlue][b]0.4.0[/b][/color]
+
+[list]
+[*]Works again on SULFUR 1.0 (tested on 1.0.2). Since game version 0.18.3 the mod had stopped loading its features entirely, so dash strike, kill refresh and healing did nothing.[/*]
+[*]Fixed dash strike damage on SULFUR 1.0.2.[/*]
+[*]Now requires Toggle Melee Stance 1.5.0. That update also lets you switch straight from melee stance to a weapon with the weapon keys, and fixes the fire button getting stuck after an Endless mode level-up.[/*]
+[*]Updating by hand: the plugin file is still [color=#ffff00]The Dragonblade.dll[/color], so replace the old one instead of keeping two copies, keep [color=#ffff00]dash_icon.png[/color] and the [color=#ffff00]lang[/color] folder next to it, and update Toggle Melee Stance to 1.5.0 yourself.[/*]
+[/list]
+[color=RoyalBlue][b]0.3.1[/b][/color]
+
+[list]
+[*]Added SULFUR Config translations for 14 languages. No gameplay changes.[/*]
+[/list]
+[color=RoyalBlue][b]0.3.0[/b][/color]
+
+[list]
+[*]Changed The Dragonblade to require Toggle Melee Stance as a prerequisite.[/*]
+[*]Removed duplicated toggle melee input patches from The Dragonblade.[/*]
+[*]Dragonblade now reads melee stance state from Toggle Melee Stance public API.[/*]
+[*]Moved tap / hold melee key behavior and external weapon switch handling to Toggle Melee Stance.[/*]
+[*]Reduced risk of double-patching melee input when both mods are installed.[/*]
+[/list]
