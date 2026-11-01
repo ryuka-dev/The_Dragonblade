@@ -3,8 +3,8 @@
   // ReceiveDamage(DamageSourceData) patch survives real kills without errors.
   "name": "dragonblade-compat-smoke",
   "mod": "kumo.sulfur.melee_expansion",
-  "description": "Startup: the self-check passes (no missing member, no arity mismatch) and every Harmony patch applies. Steps: kill enemies through the player's damage path, which runs the patched Unit.ReceiveDamage(float, DamageSourceData, Hitmesh.Data, Vector3?) prefix/postfix. The dash strike itself is NOT covered: it needs Toggle Melee Stance's stance, entered with the melee key, and on the reference machine that key is a mouse side button the input tool cannot press. Check the dash by hand (stance on, sprint key at an enemy: 'Katana Dash hit unit' and an HP drop). Needs a save slot that starts at the hub; slot 3 was mid-run after the 2026-11-01 session.",
-  "setup": { "slot": 3, "chapter": "Act_01_Sewers", "seed": 20261101, "godMode": true, "instances": ["host"] },
+  "description": "Startup: the self-check passes (no missing member, no arity mismatch) and every Harmony patch applies. Steps: kill enemies through the player's damage path, which runs the patched Unit.ReceiveDamage(float, DamageSourceData, Hitmesh.Data, Vector3?) prefix/postfix. The dash strike itself is NOT covered: it needs Toggle Melee Stance's stance, entered with the melee key, and on the reference machine that key is a mouse side button the input tool cannot press. Check the dash by hand (stance on, sprint key at an enemy: 'Katana Dash hit unit' and an HP drop). Slot 3 is restored from the test profile's fixture first (it stands in the hub), because a run left in progress makes the slot resume mid-level.",
+  "setup": { "slot": 3, "resetSlot": true, "chapter": "Act_01_Sewers", "seed": 20261101, "godMode": true, "instances": ["host"] },
   "steps": [
     { "label": "enable dash/kill debug log", "do": "call", "instance": "host", "method": "config_set",
       "args": { "guid": "kumo.sulfur.melee_expansion", "section": "Debug", "key": "LogDash", "value": "true" } },
