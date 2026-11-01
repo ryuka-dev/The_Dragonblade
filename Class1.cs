@@ -103,6 +103,10 @@ namespace MeleeExpansion
         private static MethodInfo mUnitReceiveDamageWithDamageSourceData;
         private static MethodInfo mEntityStatsModifyStatus;
 
+        // Position of the DamageSourceData argument in
+        // Unit.ReceiveDamage(float, DamageSourceData, Hitmesh.Data, Vector3?).
+        private const int ReceiveDamageSourceDataIndex = 1;
+
         private static PropertyInfo pIsMelee;
         private static PropertyInfo pAnimator;
         private static PropertyInfo pSprintAction;
@@ -627,7 +631,8 @@ namespace MeleeExpansion
             if (mUnitReceiveDamageWithDamageSourceData != null)
             {
                 Type damageSourceDataType =
-                    mUnitReceiveDamageWithDamageSourceData.GetParameters()[2].ParameterType;
+                    mUnitReceiveDamageWithDamageSourceData
+                        .GetParameters()[ReceiveDamageSourceDataIndex].ParameterType;
 
                 fDamageSourceDataIsPlayer = AccessTools.Field(
                     damageSourceDataType,
@@ -758,22 +763,22 @@ namespace MeleeExpansion
                    Require(mHandleMeleeInput, "EquipmentManager.HandleMeleeInput(bool)") &&
                    Require(mPullTrigger, "EquipmentManager.PullTrigger()") &&
                    Require(mReleaseTrigger, "EquipmentManager.ReleaseTrigger()") &&
-                   Require(mChargeBasicMelee, "EquipmentManager.ChargeBasicMelee()") &&
-                   Require(mUseBasicMelee, "EquipmentManager.UseBasicMelee()") &&
-                   Require(mOnMeleeDone, "EquipmentManager.OnMeleeDone()") &&
+                   RequireArity(mChargeBasicMelee, 0, "EquipmentManager.ChargeBasicMelee()") &&
+                   RequireArity(mUseBasicMelee, 0, "EquipmentManager.UseBasicMelee()") &&
+                   RequireArity(mOnMeleeDone, 0, "EquipmentManager.OnMeleeDone()") &&
                    Require(mReportMeleeDone, "Weapon.ReportMeleeDone()") &&
-                   Require(mIsMeleeCharging, "Weapon.IsMeleeCharging()") &&
+                   RequireArity(mIsMeleeCharging, 0, "Weapon.IsMeleeCharging()") &&
                    Require(mChargeMelee, "Weapon.ChargeMelee(bool)") &&
                    Require(mSetAlternativeState, "Weapon.SetAlternativeState(int)") &&
-                   Require(mWeaponGetDamage, "Weapon.GetDamage()") &&
+                   RequireArity(mWeaponGetDamage, 1, "Weapon.GetDamage(int pellets)") &&
                    Require(entityAttributeMaxHealth, "EntityAttributes max health") &&
 Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
-                   Require(mWeaponGetDamageType, "Weapon.GetDamageType()") &&
+                   RequireArity(mWeaponGetDamageType, 0, "Weapon.GetDamageType()") &&
                    Require(mUpdateSprinting, "ExtendedAdvancedWalkerController.UpdateSprinting()") &&
                    Require(mToggleSprint, "ExtendedAdvancedWalkerController.ToggleSprint(bool)") &&
                    Require(mMoverSetVelocity, "Mover.SetVelocity(Vector3)") &&
                    Require(mUnitReceiveDamageWithIDamager, "Unit.ReceiveDamage(float, DamageTypes, IDamager, Hitmesh.Data, Vector3?)") &&
-                   Require(mUnitReceiveDamageWithDamageSourceData, "Unit.ReceiveDamage(float, DamageTypes, DamageSourceData, Hitmesh.Data, Vector3?)") &&
+                   Require(mUnitReceiveDamageWithDamageSourceData, "Unit.ReceiveDamage(float, DamageSourceData, Hitmesh.Data, Vector3?)") &&
                    Require(hitmeshDataType, "Hitmesh.Data parameter type") &&
                    Require(hitmeshDataDefault, "Hitmesh.Data.Default") &&
                    Require(fDamageSourceDataIsPlayer, "DamageSourceData.isPlayer") &&
@@ -803,6 +808,26 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
                 return true;
 
             Log?.LogError("Missing required member: " + name);
+            return false;
+        }
+
+        // For methods looked up by name alone: an appended parameter still resolves,
+        // but a raw Invoke must pass every parameter, so the count has to match.
+        private static bool RequireArity(MethodInfo method, int parameterCount, string name)
+        {
+            if (!Require(method, name))
+                return false;
+
+            int actual = method.GetParameters().Length;
+
+            if (actual == parameterCount)
+                return true;
+
+            Log?.LogError(
+                "Incompatible signature for required member: " + name +
+                " (expected " + parameterCount + " parameter(s), the game method has " +
+                actual + ")"
+            );
             return false;
         }
 
@@ -886,18 +911,32 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
                 if (method.Name != "ReceiveDamage")
                     continue;
 
+                // Patch the declaration on Unit itself; Npc and Breakable override it
+                // and call base on their normal paths.
+                if (method.DeclaringType != unitType)
+                    continue;
+
                 ParameterInfo[] parameters = method.GetParameters();
 
-                if (parameters.Length != 5)
+                if (parameters.Length != 4)
                     continue;
 
                 if (parameters[0].ParameterType != typeof(float))
                     continue;
 
-                if (parameters[2].ParameterType.Name != "DamageSourceData")
+                if (parameters[ReceiveDamageSourceDataIndex].ParameterType.Name != "DamageSourceData")
                     continue;
 
-                if (parameters[4].ParameterType != typeof(Vector3?))
+                Type hitboxType = parameters[2].ParameterType;
+
+                if (hitboxType.Name != "Data" ||
+                    hitboxType.DeclaringType == null ||
+                    hitboxType.DeclaringType.Name != "Hitmesh")
+                {
+                    continue;
+                }
+
+                if (parameters[3].ParameterType != typeof(Vector3?))
                     continue;
 
                 return method;
@@ -1339,10 +1378,10 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
             if (!IsKilledUnitEligibleForDashRefresh(__instance))
                 return;
 
-            if (__args == null || __args.Length < 3)
+            if (__args == null || __args.Length <= ReceiveDamageSourceDataIndex)
                 return;
 
-            object damageSourceData = __args[2];
+            object damageSourceData = __args[ReceiveDamageSourceDataIndex];
 
             object sourceUnit;
 
@@ -2052,7 +2091,11 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
 
             try
             {
-                float baseDamage = Convert.ToSingle(mWeaponGetDamage.Invoke(katana, null));
+                // pellets = 1: a dash strike is one hit. This is what the game's own
+                // melee hitbox passes and gives the same value as GetDamage() before 1.0.2.
+                float baseDamage = Convert.ToSingle(
+                    mWeaponGetDamage.Invoke(katana, new object[] { 1 })
+                );
                 float damage = baseDamage * GetDashDamageMultiplier();
                 object damageType = mWeaponGetDamageType.Invoke(katana, null);
 
