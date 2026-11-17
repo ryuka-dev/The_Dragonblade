@@ -171,6 +171,10 @@ namespace MeleeExpansion
         private static readonly ConditionalWeakTable<object, KatanaDashState> DashStates =
             new ConditionalWeakTable<object, KatanaDashState>();
 
+        // The local player's walker, remembered from the last frame it was in katana dash context.
+        // Read it only through GetLastKnownWalkerController: the game destroys the player on every
+        // level change and death and spawns a new one, and a plain null check on an object field
+        // does not notice a destroyed Unity object.
         private static object lastKnownWalkerController;
 
         private void Awake()
@@ -459,27 +463,29 @@ namespace MeleeExpansion
             if (EnableDashHud == null || !EnableDashHud.Value)
                 return;
 
-            if (lastKnownWalkerController == null)
+            object walkerController = GetLastKnownWalkerController();
+
+            if (walkerController == null)
                 return;
 
             // IMGUI draws over every uGUI canvas, the loading screen included.
             if (LoadingScreenState.IsShown())
                 return;
 
-            object equipmentManager = GetEquipmentManagerFromWalker(lastKnownWalkerController);
+            object equipmentManager = GetEquipmentManagerFromWalker(walkerController);
 
             if (equipmentManager == null)
                 return;
 
             object katana;
 
-            if (!IsKatanaDashHudContext(lastKnownWalkerController, equipmentManager, out katana))
+            if (!IsKatanaDashHudContext(walkerController, equipmentManager, out katana))
                 return;
 
-            KatanaDashState dashState = GetDashState(lastKnownWalkerController);
+            KatanaDashState dashState = GetDashState(walkerController);
 
             bool canUseDashNow = IsKatanaDashContext(
-                lastKnownWalkerController,
+                walkerController,
                 equipmentManager,
                 out _
             );
@@ -1481,7 +1487,7 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
 
             if (walkerController == null)
             {
-                walkerController = lastKnownWalkerController;
+                walkerController = GetLastKnownWalkerController();
             }
 
             if (walkerController == null)
@@ -2289,6 +2295,19 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
             }
 
             return text;
+        }
+
+        // The remembered walker, or null once the game has destroyed it (level change, death). A
+        // destroyed walker still answers field reads with the old player's state, which would keep
+        // the Dash HUD on screen after the stance is gone, so it is dropped here instead.
+        private static object GetLastKnownWalkerController()
+        {
+            UnityEngine.Object walker = lastKnownWalkerController as UnityEngine.Object;
+
+            if (!ReferenceEquals(walker, null) && walker == null)
+                lastKnownWalkerController = null;
+
+            return lastKnownWalkerController;
         }
 
         private static object GetEquipmentManagerFromWalker(object walkerController)
@@ -3554,13 +3573,15 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
 
         private static string GetDashKeyLabel()
         {
+            object walkerController = GetLastKnownWalkerController();
+
             if (DashHudUseActualSprintBinding != null &&
                 DashHudUseActualSprintBinding.Value &&
-                lastKnownWalkerController != null)
+                walkerController != null)
             {
                 try
                 {
-                    InputAction action = GetSprintAction(lastKnownWalkerController);
+                    InputAction action = GetSprintAction(walkerController);
 
                     if (action != null)
                     {
