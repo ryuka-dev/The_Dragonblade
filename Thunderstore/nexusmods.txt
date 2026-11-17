@@ -9,9 +9,9 @@ But for a moment, a fragment of his power answers your hand.
 
 The Dragonblade is a katana-focused melee expansion mod for SULFUR.
 
-It adds a cyber-ninja style dash strike, kill-based cooldown refresh, enemy-kill healing, and a bottom-right ability HUD for katana stance gameplay.
+It adds a cyber-ninja style dash strike, kill-based cooldown refresh, enemy-kill healing, and an ability HUD for katana stance gameplay that you can move to any corner or edge of the screen.
 
-Works on SULFUR 1.0 (tested on 1.0.2).
+Works on SULFUR 1.0 (tested on 1.0.6).
 
 Starting from [color=#ffff00]0.3.0[/color], The Dragonblade uses [b]Toggle Melee Stance[/b] as its prerequisite melee stance module.
 
@@ -245,7 +245,7 @@ Hides the falling animation during the post-dash hang.
 SuppressFallingAnimationDuringPostHang = true[/code]
 [color=DodgerBlue][b]EnableDashHud[/b][/color]
 
-Shows the dash cooldown HUD in the bottom-right corner.
+Shows the dash cooldown HUD. It sits in the bottom-right corner unless [color=#ffff00]DashHudAnchor[/color] says otherwise.
 
 [code][UI]
 EnableDashHud = true[/code]
@@ -257,10 +257,23 @@ PNG file used as the HUD icon. It is loaded from the same folder as [color=#ffff
 DashIconFileName = dash_icon.png[/code]
 [color=DodgerBlue][b]DashHudIconSize[/b][/color]
 
-HUD icon size in pixels (48 to 128).
+HUD icon size in pixels on a 1080p screen (48 to 128). The HUD grows and shrinks with your resolution and with the game's own HUD size setting, the same way the game's HUD does, so its place next to the game's HUD looks the same at any resolution.
 
 [code][UI]
 DashHudIconSize = 76[/code]
+[color=DodgerBlue][b]DashHudAnchor[/b][/color]
+
+Where the HUD goes: [color=#ffff00]BottomRight[/color], [color=#ffff00]BottomCenter[/color], [color=#ffff00]BottomLeft[/color], [color=#ffff00]MiddleRight[/color], [color=#ffff00]MiddleLeft[/color], [color=#ffff00]TopRight[/color], [color=#ffff00]TopCenter[/color] or [color=#ffff00]TopLeft[/color]. Left and right positions also move inward with the game's ultrawide HUD padding. Near the top of the screen, the RESET and +HP labels show under the HUD instead of above it.
+
+[code][UI]
+DashHudAnchor = BottomRight[/code]
+[color=DodgerBlue][b]DashHudOffsetX / DashHudOffsetY[/b][/color]
+
+Moves the HUD from its anchor, in pixels on a 1080p screen. Positive X moves it right, positive Y moves it up. For example, [color=#ffff00]DashHudOffsetY = 150[/color] lifts it above a pistol's ammo counter. Each gun has its own counter, so a gun with a bigger one may need more. The HUD never goes past the edge of the screen.
+
+[code][UI]
+DashHudOffsetX = 0
+DashHudOffsetY = 0[/code]
 [color=DodgerBlue][b]DashHudUseActualSprintBinding[/b][/color]
 
 Shows your actual Sprint binding on the HUD when the game reports it.
@@ -336,7 +349,7 @@ This mod is an unofficial fan-made gameplay mod for SULFUR.
 
 This mod includes localization files for SULFUR Config.
 
-This localization support is only for the in-game configuration page provided by SULFUR Config. The mod name and config sections are translated in every language below, and setting names in Simplified Chinese and Japanese. Setting descriptions are still in English.
+This localization support is only for the in-game configuration page provided by SULFUR Config. The mod name and config sections are translated in every language below, and setting names in Simplified Chinese, Traditional Chinese and Japanese. Setting descriptions are still in English.
 
 It does not change the game’s own text, item names, dialogue, or gameplay content.
 
@@ -345,6 +358,7 @@ Supported SULFUR Config languages:
 [list]
 [*]English[/*]
 [*]Simplified Chinese[/*]
+[*]Traditional Chinese[/*]
 [*]Swedish[/*]
 [*]French[/*]
 [*]Italian[/*]
@@ -360,6 +374,15 @@ Supported SULFUR Config languages:
 [/list]
 [font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
 
+[color=RoyalBlue][b]0.5.0[/b][/color]
+
+[list]
+[*]You can move the Dash HUD now. [color=#ffff00]DashHudAnchor[/color] puts it in any corner or edge of the screen, and [color=#ffff00]DashHudOffsetX[/color] / [color=#ffff00]DashHudOffsetY[/color] nudge it from there. In katana stance the game keeps your gun's ammo counter in the bottom-right corner, right under the HUD; [color=#ffff00]DashHudOffsetY = 150[/color] lifts the HUD above a pistol's counter.[/*]
+[*]The Dash HUD now scales with your resolution and the game's HUD Size setting, the same way the game's own HUD does, and moves in with the ultrawide HUD padding. At 1080p it looks the same as before. At 1440p it's about a third bigger and at 4K twice as big, so if you had raised [color=#ffff00]DashHudIconSize[/color] to make up for a small icon on a big screen, you may want to lower it again.[/*]
+[*]The Dash HUD no longer shows on top of the loading screen.[/*]
+[*]Added Traditional Chinese to the SULFUR Config translations.[/*]
+[*]Tested on SULFUR 1.0.6.[/*]
+[/list]
 [color=RoyalBlue][b]0.4.0[/b][/color]
 
 [list]

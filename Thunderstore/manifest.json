@@ -1,6 +1,6 @@
 {
   "name": "The_Dragonblade",
-  "version_number": "0.4.0",
+  "version_number": "0.5.0",
   "website_url": "https://github.com/ryuka-dev/The_Dragonblade",
   "description": "A cyber-ninja katana expansion with dash strike, kill refresh, enemy-kill healing, and an ability HUD. Requires Toggle Melee Stance.",
   "dependencies": [

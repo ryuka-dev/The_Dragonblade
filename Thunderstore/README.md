@@ -11,7 +11,7 @@ The Dragonblade is a katana-focused melee expansion mod for SULFUR.
 
 It adds a cyber-ninja style dash strike, kill-based cooldown refresh, enemy-kill healing, and an ability HUD for katana stance gameplay that you can move to any corner or edge of the screen.
 
-Works on SULFUR 1.0 (tested on 1.0.2).
+Works on SULFUR 1.0 (tested on 1.0.6).
 
 Starting from `0.3.0`, The Dragonblade uses **Toggle Melee Stance** as its prerequisite melee stance module.
 
