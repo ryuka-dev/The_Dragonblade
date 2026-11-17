@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1
+
+- Fixed the Dash HUD showing up over your gun after you changed levels or died in katana stance.
+- Toggle Melee Stance 1.7.0 fixes the same thing on its side, and also fixes an error that kept repeating after dying in melee stance on Hard. Worth updating, but this version doesn't need it.
+- Tested on SULFUR 1.0.6.
+
 ## 0.5.0
 
 - You can move the Dash HUD now. `DashHudAnchor` puts it in any corner or edge of the screen, and `DashHudOffsetX` / `DashHudOffsetY` nudge it from there. In katana stance the game keeps your gun's ammo counter in the bottom-right corner, right under the HUD; `DashHudOffsetY = 150` lifts the HUD above a pistol's counter.

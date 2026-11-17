@@ -374,6 +374,13 @@ Supported SULFUR Config languages:
 [/list]
 [font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
 
+[color=RoyalBlue][b]0.5.1[/b][/color]
+
+[list]
+[*]Fixed the Dash HUD showing up over your gun after you changed levels or died in katana stance.[/*]
+[*]Toggle Melee Stance 1.7.0 fixes the same thing on its side, and also fixes an error that kept repeating after dying in melee stance on Hard. Worth updating, but this version doesn't need it.[/*]
+[*]Tested on SULFUR 1.0.6.[/*]
+[/list]
 [color=RoyalBlue][b]0.5.0[/b][/color]
 
 [list]
