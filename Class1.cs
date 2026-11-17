@@ -153,6 +153,8 @@ namespace MeleeExpansion
         private static string PluginDirectory;
         private static Texture2D DashIconTexture;
         private static Texture2D HudPixelTexture;
+        private static GUIStyle HudLabelStyle;
+        private static GUIStyle HudLabelOutlineStyle;
         private static bool DashIconLoadAttempted;
 
         private static MethodInfo mEntityStatsGetStatus;
@@ -446,6 +448,11 @@ namespace MeleeExpansion
 
         private void OnGUI()
         {
+            // The HUD has no controls, so only the Repaint event draws anything; the other events
+            // (Layout, input) would just repeat the work below.
+            if (Event.current.type != EventType.Repaint)
+                return;
+
             if (!IsModActive())
                 return;
 
@@ -453,6 +460,10 @@ namespace MeleeExpansion
                 return;
 
             if (lastKnownWalkerController == null)
+                return;
+
+            // IMGUI draws over every uGUI canvas, the loading screen included.
+            if (LoadingScreenState.IsShown())
                 return;
 
             object equipmentManager = GetEquipmentManagerFromWalker(lastKnownWalkerController);
@@ -3501,14 +3512,24 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
             float outline
         )
         {
-            GUIStyle style = new GUIStyle(GUI.skin.label);
+            // Built once from the skin and re-set per label, instead of two new styles per label per event.
+            if (HudLabelStyle == null)
+            {
+                HudLabelStyle = new GUIStyle(GUI.skin.label);
+                HudLabelStyle.fontStyle = FontStyle.Bold;
+
+                HudLabelOutlineStyle = new GUIStyle(HudLabelStyle);
+                HudLabelOutlineStyle.normal.textColor = Color.black;
+            }
+
+            GUIStyle style = HudLabelStyle;
             style.alignment = alignment;
             style.fontSize = fontSize;
-            style.fontStyle = FontStyle.Bold;
             style.normal.textColor = color;
 
-            GUIStyle outlineStyle = new GUIStyle(style);
-            outlineStyle.normal.textColor = Color.black;
+            GUIStyle outlineStyle = HudLabelOutlineStyle;
+            outlineStyle.alignment = alignment;
+            outlineStyle.fontSize = fontSize;
 
             Rect offset;
 
