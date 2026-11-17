@@ -9,7 +9,7 @@ But for a moment, a fragment of his power answers your hand.
 
 The Dragonblade is a katana-focused melee expansion mod for SULFUR.
 
-It adds a cyber-ninja style dash strike, kill-based cooldown refresh, enemy-kill healing, and a bottom-right ability HUD for katana stance gameplay.
+It adds a cyber-ninja style dash strike, kill-based cooldown refresh, enemy-kill healing, and an ability HUD for katana stance gameplay that you can move to any corner or edge of the screen.
 
 Works on SULFUR 1.0 (tested on 1.0.2).
 
@@ -318,7 +318,7 @@ SuppressFallingAnimationDuringPostHang = true
 
 ### EnableDashHud
 
-Shows the dash cooldown HUD in the bottom-right corner.
+Shows the dash cooldown HUD. It sits in the bottom-right corner unless `DashHudAnchor` says otherwise.
 
 ```ini
 [UI]
@@ -336,11 +336,30 @@ DashIconFileName = dash_icon.png
 
 ### DashHudIconSize
 
-HUD icon size in pixels (48 to 128).
+HUD icon size in pixels on a 1080p screen (48 to 128). The HUD grows and shrinks with your resolution and with the game's own HUD size setting, the same way the game's HUD does, so its place next to the game's HUD looks the same at any resolution.
 
 ```ini
 [UI]
 DashHudIconSize = 76
+```
+
+### DashHudAnchor
+
+Where the HUD goes: `BottomRight`, `BottomCenter`, `BottomLeft`, `MiddleRight`, `MiddleLeft`, `TopRight`, `TopCenter` or `TopLeft`. Left and right positions also move inward with the game's ultrawide HUD padding. Near the top of the screen, the RESET and +HP labels show under the HUD instead of above it.
+
+```ini
+[UI]
+DashHudAnchor = BottomRight
+```
+
+### DashHudOffsetX / DashHudOffsetY
+
+Moves the HUD from its anchor, in pixels on a 1080p screen. Positive X moves it right, positive Y moves it up. For example, `DashHudOffsetY = 150` lifts it above a pistol's ammo counter. Each gun has its own counter, so a gun with a bigger one may need more. The HUD never goes past the edge of the screen.
+
+```ini
+[UI]
+DashHudOffsetX = 0
+DashHudOffsetY = 0
 ```
 
 ### DashHudUseActualSprintBinding

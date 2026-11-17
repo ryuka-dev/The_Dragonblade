@@ -62,6 +62,9 @@ namespace MeleeExpansion
         internal static ConfigEntry<bool> EnableDashHud;
         internal static ConfigEntry<string> DashIconFileName;
         internal static ConfigEntry<float> DashHudIconSize;
+        internal static ConfigEntry<DashHudAnchor> DashHudAnchorPosition;
+        internal static ConfigEntry<float> DashHudOffsetX;
+        internal static ConfigEntry<float> DashHudOffsetY;
         internal static ConfigEntry<bool> DashHudUseActualSprintBinding;
         internal static ConfigEntry<string> DashHudFallbackKeyLabel;
         internal static ConfigEntry<float> DashKillRefreshFeedbackDuration;
@@ -320,7 +323,7 @@ namespace MeleeExpansion
                 "UI",
                 "EnableDashHud",
                 true,
-                "Show a bottom-right Katana Dash cooldown HUD."
+                "Show the Katana Dash cooldown HUD."
             );
 
             DashIconFileName = Config.Bind(
@@ -335,8 +338,35 @@ namespace MeleeExpansion
                 "DashHudIconSize",
                 76f,
                 new ConfigDescription(
-                    "Dash HUD icon size in pixels.",
+                    "Dash HUD icon size in pixels on a 1080p screen. The HUD grows and shrinks with the screen resolution and the game's HUD size setting, like the game's own HUD.",
                     new AcceptableValueRange<float>(48f, 128f)
+                )
+            );
+
+            DashHudAnchorPosition = Config.Bind(
+                "UI",
+                "DashHudAnchor",
+                DashHudAnchor.BottomRight,
+                "Screen corner or edge the Dash HUD is placed at. Left and right positions also follow the game's ultrawide HUD padding."
+            );
+
+            DashHudOffsetX = Config.Bind(
+                "UI",
+                "DashHudOffsetX",
+                0f,
+                new ConfigDescription(
+                    "Moves the Dash HUD sideways from its anchor, in pixels on a 1080p screen. Positive moves right, negative moves left. The HUD always stays on screen.",
+                    new AcceptableValueRange<float>(-1920f, 1920f)
+                )
+            );
+
+            DashHudOffsetY = Config.Bind(
+                "UI",
+                "DashHudOffsetY",
+                0f,
+                new ConfigDescription(
+                    "Moves the Dash HUD up or down from its anchor, in pixels on a 1080p screen. Positive moves up, negative moves down. The HUD always stays on screen.",
+                    new AcceptableValueRange<float>(-1080f, 1080f)
                 )
             );
 
@@ -3167,16 +3197,30 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
         {
             EnsureDashHudTextures();
 
+            // Layout below is in HUD units (pixels on a 1080p screen at the game's default HUD size);
+            // DashHudLayout turns them into screen pixels the way the game sizes its own HUD.
             float size = Mathf.Clamp(DashHudIconSize.Value, 48f, 128f);
-            float panelWidth = size + 26f;
-            float panelHeight = size + 42f;
 
-            float x = Screen.width - panelWidth - 34f;
-            float y = Screen.height - panelHeight - 34f;
+            DashHudPlacement placement = DashHudLayout.Place(
+                size + 26f,
+                size + 42f,
+                DashHudAnchorPosition.Value,
+                DashHudOffsetX.Value,
+                DashHudOffsetY.Value
+            );
 
-            Rect panelRect = new Rect(x, y, panelWidth, panelHeight);
-            Rect iconRect = new Rect(x + 13f, y + 10f, size, size);
-            Rect keyRect = new Rect(x + 13f, y + 13f + size, size, 22f);
+            float s = placement.Scale;
+            Rect panelRect = placement.Panel;
+            float x = panelRect.x;
+            float y = panelRect.y;
+
+            Rect iconRect = new Rect(x + Mathf.Round(13f * s), y + Mathf.Round(10f * s), Mathf.Round(size * s), Mathf.Round(size * s));
+            Rect keyRect = new Rect(iconRect.x, y + Mathf.Round((13f + size) * s), iconRect.width, Mathf.Round(22f * s));
+
+            float thinLine = HudLine(1f, s);
+            float line = HudLine(2f, s);
+            float thickLine = HudLine(3f, s);
+            float iconFrame = Mathf.Round(3f * s);
 
             float cooldownLeft = Mathf.Max(0f, dashState.NextDashTime - Time.time);
             float cooldownTotal = Mathf.Max(0.01f, GetDashCooldown());
@@ -3192,11 +3236,11 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
                 ? new Color(0.45f, 1f, 0.55f, 1f)
                 : new Color(0.95f, 0.95f, 0.9f, 0.85f);
 
-            DrawRect(new Rect(panelRect.x + 4f, panelRect.y + 4f, panelRect.width, panelRect.height), new Color(0f, 0f, 0f, 0.35f));
+            DrawRect(new Rect(panelRect.x + 4f * s, panelRect.y + 4f * s, panelRect.width, panelRect.height), new Color(0f, 0f, 0f, 0.35f));
             DrawRect(panelRect, new Color(0.02f, 0.02f, 0.025f, 0.78f));
 
-            DrawBorder(panelRect, refreshFeedbackActive ? 3f : 2f, ready ? readyBorder : new Color(0.45f, 0.45f, 0.45f, 0.85f));
-            DrawBorder(new Rect(iconRect.x - 3f, iconRect.y - 3f, iconRect.width + 6f, iconRect.height + 6f), refreshFeedbackActive ? 3f : 2f, refreshFeedbackActive ? new Color(0.3f, 1f, 0.45f, 1f) : new Color(0f, 0f, 0f, 0.9f));
+            DrawBorder(panelRect, refreshFeedbackActive ? thickLine : line, ready ? readyBorder : new Color(0.45f, 0.45f, 0.45f, 0.85f));
+            DrawBorder(new Rect(iconRect.x - iconFrame, iconRect.y - iconFrame, iconRect.width + 2f * iconFrame, iconRect.height + 2f * iconFrame), refreshFeedbackActive ? thickLine : line, refreshFeedbackActive ? new Color(0.3f, 1f, 0.45f, 1f) : new Color(0f, 0f, 0f, 0.9f));
 
             if (DashIconTexture != null)
             {
@@ -3206,7 +3250,7 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
             else
             {
                 DrawRect(iconRect, new Color(0.15f, 0.15f, 0.16f, 1f));
-                DrawOutlinedLabel(iconRect, "DASH", 18, Color.white, TextAnchor.MiddleCenter);
+                DrawOutlinedLabel(iconRect, "DASH", HudFont(18, s), Color.white, TextAnchor.MiddleCenter, thinLine);
             }
 
             if (!ready)
@@ -3243,52 +3287,75 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
                 DrawOutlinedLabel(
                     iconRect,
                     cooldownText,
-                    cooldownLeft >= 1f ? 34 : 28,
+                    HudFont(cooldownLeft >= 1f ? 34 : 28, s),
                     refreshFeedbackActive ? new Color(0.7f, 1f, 0.75f, 1f) : Color.white,
-                    TextAnchor.MiddleCenter
+                    TextAnchor.MiddleCenter,
+                    thinLine
                 );
             }
             else
             {
-                DrawBorder(iconRect, refreshFeedbackActive ? 3f : 2f, refreshFeedbackActive ? new Color(0.35f, 1f, 0.45f, 1f) : new Color(0.75f, 1f, 0.85f, 0.95f));
+                DrawBorder(iconRect, refreshFeedbackActive ? thickLine : line, refreshFeedbackActive ? new Color(0.35f, 1f, 0.45f, 1f) : new Color(0.75f, 1f, 0.85f, 0.95f));
             }
+
+            // Above the icon normally; below the panel when it sits too close to the top of the screen.
+            float resetLabelY = placement.FeedbackBelow ? panelRect.yMax + 2f * s : iconRect.y - 22f * s;
+            float healLabelY = placement.FeedbackBelow ? panelRect.yMax + 22f * s : iconRect.y - 42f * s;
 
             if (refreshFeedbackActive)
             {
                 DrawOutlinedLabel(
-                    new Rect(iconRect.x, iconRect.y - 22f, iconRect.width, 20f),
+                    new Rect(iconRect.x, resetLabelY, iconRect.width, 20f * s),
                     "RESET",
-                    14,
+                    HudFont(14, s),
                     new Color(0.45f, 1f, 0.55f, 1f),
-                    TextAnchor.MiddleCenter
+                    TextAnchor.MiddleCenter,
+                    thinLine
                 );
             }
 
             if (healFeedbackActive)
             {
                 DrawOutlinedLabel(
-                    new Rect(iconRect.x, iconRect.y - 42f, iconRect.width, 20f),
+                    new Rect(iconRect.x, healLabelY, iconRect.width, 20f * s),
                     "+" + dashState.HealFeedbackAmount.ToString("F0") + " HP",
-                    15,
+                    HudFont(15, s),
                     new Color(0.45f, 1f, 0.55f, 1f),
-                    TextAnchor.MiddleCenter
+                    TextAnchor.MiddleCenter,
+                    thinLine
                 );
             }
 
             string keyLabel = GetDashKeyLabel();
 
             DrawRect(keyRect, ready ? new Color(0.1f, 0.1f, 0.1f, 0.9f) : new Color(0.05f, 0.05f, 0.05f, 0.9f));
-            DrawBorder(keyRect, 1f, refreshFeedbackActive ? new Color(0.45f, 1f, 0.55f, 0.9f) : new Color(0.7f, 0.7f, 0.7f, 0.75f));
+            DrawBorder(keyRect, thinLine, refreshFeedbackActive ? new Color(0.45f, 1f, 0.55f, 0.9f) : new Color(0.7f, 0.7f, 0.7f, 0.75f));
 
             DrawOutlinedLabel(
                 keyRect,
                 keyLabel,
-                14,
+                HudFont(14, s),
                 ready || refreshFeedbackActive ? Color.white : new Color(0.65f, 0.65f, 0.65f, 1f),
-                TextAnchor.MiddleCenter
+                TextAnchor.MiddleCenter,
+                thinLine
             );
 
             GUI.color = oldColor;
+        }
+
+        /// <summary>A line width in HUD units at this scale, in whole pixels and never thinner than one.</summary>
+        private static float HudLine(float units, float scale)
+        {
+            return Mathf.Max(1f, Mathf.Round(units * scale));
+        }
+
+        /// <summary>
+        /// A font size in HUD units at this scale. The text is set at this size rather than stretched
+        /// through GUI.matrix, so it stays sharp.
+        /// </summary>
+        private static int HudFont(int units, float scale)
+        {
+            return Mathf.Max(1, Mathf.RoundToInt(units * scale));
         }
 
         private static void EnsureDashHudTextures()
@@ -3430,7 +3497,8 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
             string text,
             int fontSize,
             Color color,
-            TextAnchor alignment
+            TextAnchor alignment,
+            float outline
         )
         {
             GUIStyle style = new GUIStyle(GUI.skin.label);
@@ -3445,19 +3513,19 @@ Require(mEntityStatsGetStatus, "EntityStats.GetStatus(EntityAttributes)") &&
             Rect offset;
 
             offset = rect;
-            offset.x -= 1f;
+            offset.x -= outline;
             GUI.Label(offset, text, outlineStyle);
 
             offset = rect;
-            offset.x += 1f;
+            offset.x += outline;
             GUI.Label(offset, text, outlineStyle);
 
             offset = rect;
-            offset.y -= 1f;
+            offset.y -= outline;
             GUI.Label(offset, text, outlineStyle);
 
             offset = rect;
-            offset.y += 1f;
+            offset.y += outline;
             GUI.Label(offset, text, outlineStyle);
 
             GUI.Label(rect, text, style);

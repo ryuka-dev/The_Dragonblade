@@ -166,7 +166,7 @@
     },
     {
       "key": "entry.UI.EnableDashHud.description",
-      "value": "Show a bottom-right Katana Dash cooldown HUD."
+      "value": "Show the Katana Dash cooldown HUD."
     },
     {
       "key": "entry.UI.DashIconFileName.name",
@@ -182,7 +182,63 @@
     },
     {
       "key": "entry.UI.DashHudIconSize.description",
-      "value": "Dash HUD icon size in pixels."
+      "value": "Dash HUD icon size in pixels on a 1080p screen. The HUD grows and shrinks with the screen resolution and the game's HUD size setting, like the game's own HUD."
+    },
+    {
+      "key": "entry.UI.DashHudAnchor.name",
+      "value": "Dash HUD Position"
+    },
+    {
+      "key": "entry.UI.DashHudAnchor.description",
+      "value": "Screen corner or edge the Dash HUD is placed at. Left and right positions also follow the game's ultrawide HUD padding."
+    },
+    {
+      "key": "value.UI.DashHudAnchor.BottomRight",
+      "value": "Bottom Right"
+    },
+    {
+      "key": "value.UI.DashHudAnchor.BottomCenter",
+      "value": "Bottom Center"
+    },
+    {
+      "key": "value.UI.DashHudAnchor.BottomLeft",
+      "value": "Bottom Left"
+    },
+    {
+      "key": "value.UI.DashHudAnchor.MiddleRight",
+      "value": "Middle Right"
+    },
+    {
+      "key": "value.UI.DashHudAnchor.MiddleLeft",
+      "value": "Middle Left"
+    },
+    {
+      "key": "value.UI.DashHudAnchor.TopRight",
+      "value": "Top Right"
+    },
+    {
+      "key": "value.UI.DashHudAnchor.TopCenter",
+      "value": "Top Center"
+    },
+    {
+      "key": "value.UI.DashHudAnchor.TopLeft",
+      "value": "Top Left"
+    },
+    {
+      "key": "entry.UI.DashHudOffsetX.name",
+      "value": "Dash HUD Horizontal Offset"
+    },
+    {
+      "key": "entry.UI.DashHudOffsetX.description",
+      "value": "Moves the Dash HUD sideways from its anchor, in pixels on a 1080p screen. Positive moves right, negative moves left. The HUD always stays on screen."
+    },
+    {
+      "key": "entry.UI.DashHudOffsetY.name",
+      "value": "Dash HUD Vertical Offset"
+    },
+    {
+      "key": "entry.UI.DashHudOffsetY.description",
+      "value": "Moves the Dash HUD up or down from its anchor, in pixels on a 1080p screen. Positive moves up, negative moves down. The HUD always stays on screen."
     },
     {
       "key": "entry.UI.DashHudUseActualSprintBinding.name",
