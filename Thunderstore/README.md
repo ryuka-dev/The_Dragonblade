@@ -460,7 +460,7 @@ This mod is an unofficial fan-made gameplay mod for SULFUR.
 
 This mod includes localization files for SULFUR Config.
 
-This localization support is only for the in-game configuration page provided by SULFUR Config. The mod name and config sections are translated in every language below, and setting names in Simplified Chinese and Japanese. Setting descriptions are still in English.
+This localization support is only for the in-game configuration page provided by SULFUR Config. The mod name and config sections are translated in every language below, and setting names in Simplified Chinese, Traditional Chinese and Japanese. Setting descriptions are still in English.
 
 It does not change the game’s own text, item names, dialogue, or gameplay content.
 
@@ -468,6 +468,7 @@ Supported SULFUR Config languages:
 
 - English
 - Simplified Chinese
+- Traditional Chinese
 - Swedish
 - French
 - Italian
